@@ -1,16 +1,7 @@
-import React from "react";
-import { FormContainer, Title, Label, Input } from "../styles/FormStyles";
-
-interface Remedio {
-  nome: string;
-  hora: string;
-  dosagem: string;
-}
+import React, { useState } from "react";
 
 interface Step2Props {
-  values: {
-    remedios: Remedio[];
-  };
+  values: any;
   handleRemedioChange: (
     index: number,
     e: React.ChangeEvent<HTMLInputElement>
@@ -29,34 +20,68 @@ const Step2: React.FC<Step2Props> = ({
   handleSubmit,
   handleBack,
 }) => {
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  const validate = () => {
+    const newErrors: { [key: string]: string } = {};
+    values.remedios.forEach((remedio: any, index: number) => {
+      if (!remedio.nome)
+        newErrors[`nome${index}`] = "Nome do remédio é obrigatório";
+      if (!remedio.hora) newErrors[`hora${index}`] = "Hora é obrigatória";
+      if (!remedio.dosagem)
+        newErrors[`dosagem${index}`] = "Dosagem é obrigatória";
+    });
+    return newErrors;
+  };
+
+  const handleFormSubmit = () => {
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length === 0) {
+      handleSubmit();
+    } else {
+      setErrors(validationErrors);
+    }
+  };
+
   return (
-    <FormContainer>
-      <Title>Adicionar Remédios</Title>
-      {values.remedios.map((remedio, index) => (
+    <div className="max-w-xl mx-auto my-5 p-5 border border-gray-300 rounded-lg bg-gray-100">
+      {values.remedios.map((remedio: any, index: number) => (
         <div key={index} className="mb-4">
-          <Label>Nome do Remédio</Label>
-          <Input
+          <label className="block mt-2 font-bold mb-1">Nome do Remédio</label>
+          <input
             name="nome"
             type="text"
             value={remedio.nome}
             onChange={(e) => handleRemedioChange(index, e)}
+            className="w-full p-2 mb-4 border border-gray-300 rounded"
           />
+          {errors[`nome${index}`] && (
+            <p className="text-red-500 text-sm">{errors[`nome${index}`]}</p>
+          )}
 
-          <Label>Hora</Label>
-          <Input
+          <label className="block mt-2 font-bold mb-1">Hora</label>
+          <input
             name="hora"
             type="time"
             value={remedio.hora}
             onChange={(e) => handleRemedioChange(index, e)}
+            className="w-full p-2 mb-4 border border-gray-300 rounded"
           />
+          {errors[`hora${index}`] && (
+            <p className="text-red-500 text-sm">{errors[`hora${index}`]}</p>
+          )}
 
-          <Label>Dosagem</Label>
-          <Input
+          <label className="block mt-2 font-bold mb-1">Dosagem</label>
+          <input
             name="dosagem"
             type="text"
             value={remedio.dosagem}
             onChange={(e) => handleRemedioChange(index, e)}
+            className="w-full p-2 mb-4 border border-gray-300 rounded"
           />
+          {errors[`dosagem${index}`] && (
+            <p className="text-red-500 text-sm">{errors[`dosagem${index}`]}</p>
+          )}
 
           <button
             type="button"
@@ -81,13 +106,13 @@ const Step2: React.FC<Step2Props> = ({
         </button>
         <button
           type="button"
-          onClick={handleSubmit}
-          className="px-6 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+          onClick={handleFormSubmit}
+          className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
         >
           Enviar
         </button>
       </div>
-    </FormContainer>
+    </div>
   );
 };
 
